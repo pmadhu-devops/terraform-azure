@@ -1,0 +1,8 @@
+# Terraform state
+*.tfstate.*
+
+# Terraform working directory
+.terraform/
+
+# Terraform lock hcl file
+.terraform.lock.hcl
