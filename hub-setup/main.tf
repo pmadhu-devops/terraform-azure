@@ -1,144 +1,76 @@
-# Resource Group
-resource "azurerm_resource_group" "hub" {
-  name     = var.rg_name
+module "rg" {
+  source = "../modules/rg"
+
+  rg_name  = var.rg_name
   location = var.location
+  tags     = var.tags
 }
 
-# Virtual Network
-resource "azurerm_virtual_network" "hub_vnet" {
-  name                = "${var.rg_name}-vNET1"
-  location            = azurerm_resource_group.hub.location
-  resource_group_name = azurerm_resource_group.hub.name
-  address_space       = ["10.50.0.0/16"]
+module "vnet" {
+  source              = "../modules/vnet"
+  vnet_name           = var.vnet_name
+  location            = var.location
+  resource_group_name = module.rg.resource_group_name
+  address_space       = var.address_space
+  subnets             = var.subnets
+  tags                = var.tags
 }
 
-# Subnets
-resource "azurerm_subnet" "jump" {
-  name                 = "JumpServersSubnet"
-  resource_group_name  = azurerm_resource_group.hub.name
-  virtual_network_name = azurerm_virtual_network.hub_vnet.name
-  address_prefixes     = ["10.50.1.0/24"]
+module "nsg" {
+  source = "../modules/nsg"
+
+  nsg_name            = var.nsg_name
+  location            = var.location
+  resource_group_name = module.rg.resource_group_name
+  security_rules      = var.security_rules
+  tags                = var.tags
 }
 
-resource "azurerm_subnet" "firewall" {
-  name                 = "AzureFirewallSubnet"
-  resource_group_name  = azurerm_resource_group.hub.name
-  virtual_network_name = azurerm_virtual_network.hub_vnet.name
-  address_prefixes     = ["10.50.10.0/24"]
+resource "azurerm_subnet_network_security_group_association" "jumpservers" {
+  subnet_id                 = module.vnet.subnet_ids[var.subnet_name]
+  network_security_group_id = module.nsg.nsg_id
 }
 
-resource "azurerm_subnet" "bastion" {
-  name                 = "AzureBastionSubnet"
-  resource_group_name  = azurerm_resource_group.hub.name
-  virtual_network_name = azurerm_virtual_network.hub_vnet.name
-  address_prefixes     = ["10.50.20.0/24"]
+module "vm" {
+  source = "../modules/linux-vm"
+
+  vm_name             = var.vm_name
+  location            = var.location
+  resource_group_name = module.rg.resource_group_name
+  subnet_id           = module.vnet.subnet_ids[var.subnet_name]
+  vm_size             = var.vm_size
+  admin_username      = var.admin_username
+  admin_password      = var.admin_password
+  private_ip_address  = var.private_ip_address
+  availability_zone   = var.availability_zone
+  storage_account_type = var.storage_account_type
+  tags                = var.tags
+
+  depends_on = [azurerm_subnet_network_security_group_association.jumpservers]
 }
 
-resource "azurerm_subnet" "gateway" {
-  name                 = "GatewaySubnet"
-  resource_group_name  = azurerm_resource_group.hub.name
-  virtual_network_name = azurerm_virtual_network.hub_vnet.name
-  address_prefixes     = ["10.50.30.0/24"]
-}
-
-resource "azurerm_subnet" "private_endpoint" {
-  name                 = "PvtEndpointSubnet"
-  resource_group_name  = azurerm_resource_group.hub.name
-  virtual_network_name = azurerm_virtual_network.hub_vnet.name
-  address_prefixes     = ["10.50.40.0/24"]
-}
-
-# Network Security Group
-resource "azurerm_network_security_group" "hub_nsg" {
-  name                = "${var.rg_name}_NSG1"
-  location            = azurerm_resource_group.hub.location
-  resource_group_name = azurerm_resource_group.hub.name
-}
-
-# NSG Rules
-resource "azurerm_network_security_rule" "allow_tcp" {
-  name                        = "Allow-All-TCP"
-  priority                    = 100
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.hub.name
-  network_security_group_name = azurerm_network_security_group.hub_nsg.name
-}
-
-resource "azurerm_network_security_rule" "allow_icmp" {
-  name                        = "Allow-ICMP"
-  priority                    = 101
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Icmp"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.hub.name
-  network_security_group_name = azurerm_network_security_group.hub_nsg.name
-}
-
-# Public IP
-resource "azurerm_public_ip" "vm_pip" {
-  name                = "HUB-LNXSVR1-pip"
-  location            = azurerm_resource_group.hub.location
-  resource_group_name = azurerm_resource_group.hub.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-}
-
-# Network Interface (Public IP attached here)
-resource "azurerm_network_interface" "vm_nic" {
-  name                = "HUB-LNXSVR1-nic"
-  location            = azurerm_resource_group.hub.location
-  resource_group_name = azurerm_resource_group.hub.name
-
-  ip_configuration {
-    name                          = "ipconfig1"
-    subnet_id                     = azurerm_subnet.jump.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = "10.50.1.10"
-    public_ip_address_id          = azurerm_public_ip.vm_pip.id
-  }
-}
-
-# Associate NSG to NIC
-resource "azurerm_network_interface_security_group_association" "nic_nsg" {
-  network_interface_id      = azurerm_network_interface.vm_nic.id
-  network_security_group_id = azurerm_network_security_group.hub_nsg.id
-}
-
-# Linux Virtual Machine
-resource "azurerm_linux_virtual_machine" "hub_vm" {
-  name                = "HUB-LNXSVR1"
-  location            = azurerm_resource_group.hub.location
-  resource_group_name = azurerm_resource_group.hub.name
-  size                = "Standard_B1s"
-  zone                = "1"
-
-  admin_username = var.admin_username
-  admin_password = var.admin_password
-  disable_password_authentication = false
-
-  network_interface_ids = [
-    azurerm_network_interface.vm_nic.id
-  ]
-
-  os_disk {
-    storage_account_type = "StandardSSD_LRS"
-    caching              = "ReadWrite"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
-  }
-}
+# Feature required: Windows VM creation
+# Uncomment and provide matching variables in hub-setup/terraform.tfvars to enable.
+# This block mirrors the Azure CLI example for Win2022Datacenter and Standard_B2ms.
+# az vm create --resource-group ${RG} --name HUB-WINSVR1 --image Win2022Datacenter --vnet-name ${RG}-vNET1 \
+#     --subnet JumpServersSubnet --admin-username adminsree --admin-password "India@123456" --size Standard_B2ms \
+#     --nsg ${RG}_NSG1 --storage-sku StandardSSD_LRS --private-ip-address 10.50.1.11 \
+#     --zone 1 --os-disk-delete-option Delete --nic-delete-option Delete --security-type Standard
+#
+# module "windows_vm" {
+#   source = "../modules/windows-vm"
+#
+#   vm_name             = var.windows_vm_name
+#   location            = var.location
+#   resource_group_name = module.rg.resource_group_name
+#   subnet_id           = module.vnet.subnet_ids[var.subnet_name]
+#   vm_size             = "Standard_B2ms"
+#   admin_username      = var.windows_admin_username
+#   admin_password      = var.windows_admin_password
+#   private_ip_address  = "10.50.1.11"
+#   availability_zone   = "1"
+#   storage_account_type = var.storage_account_type
+#   tags                = var.tags
+#
+#   depends_on = [azurerm_subnet_network_security_group_association.jumpservers]
+#}

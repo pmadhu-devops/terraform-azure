@@ -1,13 +1,13 @@
 variable "rg_name" {
-  description = "Resource group name for the spoke2 setup"
+  description = "Resource group name for spoke2 setup"
   type        = string
-  default     = "AZB50-SP1-RG"
+  default     = "AZB50-SP2-RG"
 }
 
 variable "location" {
   description = "Azure region for the spoke2 resources"
   type        = string
-  default     = "eastus"
+  default     = "westus"
 }
 
 variable "tags" {
@@ -19,19 +19,13 @@ variable "tags" {
 variable "address_space" {
   description = "Address space for the spoke2 VNet"
   type        = list(string)
-  default     = ["172.16.0.0/16"]
+  default     = ["172.17.0.0/16"]
 }
 
 variable "subnet1_prefixes" {
   description = "Address prefixes for subnet 1"
   type        = list(string)
-  default     = ["172.16.1.0/24"]
-}
-
-variable "subnet2_prefixes" {
-  description = "Address prefixes for subnet 2"
-  type        = list(string)
-  default     = ["172.16.2.0/24"]
+  default     = ["172.17.1.0/24"]
 }
 
 variable "admin_username" {
@@ -47,7 +41,7 @@ variable "admin_password" {
 }
 
 variable "linux_vm_size" {
-  description = "Size for the spoke Linux VMs"
+  description = "Size for the spoke Linux VM"
   type        = string
   default     = "Standard_B1s"
 }
@@ -64,50 +58,32 @@ variable "storage_account_type" {
   default     = "StandardSSD_LRS"
 }
 
-variable "availability_zone" {
-  description = "Availability zone for the spoke VMs"
+variable "linux_vm_name" {
+  description = "Name of the Linux VM"
   type        = string
-  default     = "1"
-}
-
-variable "linux_vm1_name" {
-  description = "Name of the first Linux VM"
-  type        = string
-  default     = "SP1-LNXSVR1"
-}
-
-variable "linux_vm2_name" {
-  description = "Name of the second Linux VM"
-  type        = string
-  default     = "SP1-LNXSVR2"
+  default     = "SP2-LNXSVR1"
 }
 
 variable "windows_vm_name" {
   description = "Name of the Windows VM"
   type        = string
-  default     = "SP1-WINSVR1"
+  default     = "SP2-WINSVR1"
 }
 
-variable "linux_vm1_private_ip" {
-  description = "Private IP for the first Linux VM"
+variable "linux_vm_private_ip" {
+  description = "Private IP for the Linux VM"
   type        = string
-  default     = "172.16.1.10"
-}
-
-variable "linux_vm2_private_ip" {
-  description = "Private IP for the second Linux VM"
-  type        = string
-  default     = "172.16.2.10"
+  default     = "172.17.1.10"
 }
 
 variable "windows_vm_private_ip" {
   description = "Private IP for the Windows VM"
   type        = string
-  default     = "172.16.1.11"
+  default     = "172.17.1.11"
 }
 
 variable "security_rules" {
-  description = "Network security rules for the spoke NSG"
+  description = "Network security rules for the spoke2 NSG"
   type = map(object({
     priority                   = number
     direction                  = string
