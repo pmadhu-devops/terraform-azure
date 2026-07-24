@@ -2,7 +2,7 @@
 rg_name  = "ado-rg"
 location = "centralindia"
 tags = {
-  ENV = "poc"
+  ENV = "dev"
 }
 
 # Vnet and Subnet Configurations
@@ -42,8 +42,8 @@ security_rules = {
 }
 
 # VM Configurations
-vm_size        = "Standard_B2s"
-vm_name        = "ado-ubuntu-vm"
+vm_size        = "Standard_B2ms"
+vm_name        = "ado-linux-vm"
 admin_username = "adminmadhu"
 admin_password = "India@123456"
 vm_tags = {

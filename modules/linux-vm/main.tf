@@ -6,7 +6,7 @@ resource "azurerm_public_ip" "this" {
 
   allocation_method = "Static"
   sku               = "Standard"
-  tags = var.tags
+  tags              = var.tags
 }
 
 resource "azurerm_network_interface" "this" {
@@ -28,8 +28,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   name                = var.vm_name
   resource_group_name = var.resource_group_name
   location            = var.location
-
-  size = var.vm_size
+  size                = var.vm_size
 
   admin_username = var.admin_username
   admin_password = var.admin_password
@@ -39,7 +38,8 @@ resource "azurerm_linux_virtual_machine" "this" {
     azurerm_network_interface.this.id
   ]
 
-  zone = var.availability_zone
+  zone        = var.availability_zone
+  custom_data = var.custom_data != null ? base64encode(var.custom_data) : null
 
   os_disk {
     caching              = "ReadWrite"

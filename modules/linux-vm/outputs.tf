@@ -1,5 +1,5 @@
 output "vm_id" {
-  value = azurerm_linux_virtual_machine.this.id
+  value       = azurerm_linux_virtual_machine.this.id
   description = "ID of the created Linux Virtual Machine"
 }
 

@@ -51,7 +51,8 @@ module "vm" {
 
   storage_account_type = var.storage_account_type
 
-  tags = var.vm_tags
+  tags        = var.vm_tags
+  custom_data = file("${path.module}/scripts/install-tools.sh")
 
   depends_on = [azurerm_subnet_network_security_group_association.subnet_nsg]
 }

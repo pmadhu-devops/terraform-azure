@@ -39,18 +39,18 @@ resource "azurerm_subnet_network_security_group_association" "subnet1_nsg" {
 module "spoke_linux_vm" {
   source = "../modules/linux-vm"
 
-  vm_name             = var.linux_vm_name
-  location            = var.location
-  resource_group_name = module.rg.resource_group_name
-  subnet_id           = module.vnet.subnet_ids["${var.rg_name}-Subnet-1"]
-  vm_size             = var.linux_vm_size
-  admin_username      = var.admin_username
-  admin_password      = var.admin_password
-  private_ip_address  = var.linux_vm_private_ip
-  create_public_ip    = false
-  availability_zone   = null
+  vm_name              = var.linux_vm_name
+  location             = var.location
+  resource_group_name  = module.rg.resource_group_name
+  subnet_id            = module.vnet.subnet_ids["${var.rg_name}-Subnet-1"]
+  vm_size              = var.linux_vm_size
+  admin_username       = var.admin_username
+  admin_password       = var.admin_password
+  private_ip_address   = var.linux_vm_private_ip
+  create_public_ip     = false
+  availability_zone    = null
   storage_account_type = var.storage_account_type
-  tags                = var.tags
+  tags                 = var.tags
 
   depends_on = [
     azurerm_subnet_network_security_group_association.subnet1_nsg,
@@ -60,18 +60,18 @@ module "spoke_linux_vm" {
 module "spoke_windows_vm" {
   source = "../modules/windows-vm"
 
-  vm_name             = var.windows_vm_name
-  location            = var.location
-  resource_group_name = module.rg.resource_group_name
-  subnet_id           = module.vnet.subnet_ids["${var.rg_name}-Subnet-1"]
-  vm_size             = var.windows_vm_size
-  admin_username      = var.admin_username
-  admin_password      = var.admin_password
-  private_ip_address  = var.windows_vm_private_ip
-  create_public_ip    = false
-  availability_zone   = null
+  vm_name              = var.windows_vm_name
+  location             = var.location
+  resource_group_name  = module.rg.resource_group_name
+  subnet_id            = module.vnet.subnet_ids["${var.rg_name}-Subnet-1"]
+  vm_size              = var.windows_vm_size
+  admin_username       = var.admin_username
+  admin_password       = var.admin_password
+  private_ip_address   = var.windows_vm_private_ip
+  create_public_ip     = false
+  availability_zone    = null
   storage_account_type = var.storage_account_type
-  tags                = var.tags
+  tags                 = var.tags
 
   depends_on = [
     azurerm_subnet_network_security_group_association.subnet1_nsg,

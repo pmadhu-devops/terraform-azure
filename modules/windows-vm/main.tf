@@ -6,7 +6,7 @@ resource "azurerm_public_ip" "this" {
 
   allocation_method = "Static"
   sku               = "Standard"
-  tags = var.tags
+  tags              = var.tags
 }
 
 resource "azurerm_network_interface" "this" {

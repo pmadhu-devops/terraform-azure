@@ -63,3 +63,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "custom_data" {
+  description = "Base64-encoded custom data (cloud-init or script) to provision the VM at first boot"
+  type        = string
+  default     = null
+}

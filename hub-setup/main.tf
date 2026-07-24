@@ -34,17 +34,17 @@ resource "azurerm_subnet_network_security_group_association" "jumpservers" {
 module "vm" {
   source = "../modules/linux-vm"
 
-  vm_name             = var.vm_name
-  location            = var.location
-  resource_group_name = module.rg.resource_group_name
-  subnet_id           = module.vnet.subnet_ids[var.subnet_name]
-  vm_size             = var.vm_size
-  admin_username      = var.admin_username
-  admin_password      = var.admin_password
-  private_ip_address  = var.private_ip_address
-  availability_zone   = var.availability_zone
+  vm_name              = var.vm_name
+  location             = var.location
+  resource_group_name  = module.rg.resource_group_name
+  subnet_id            = module.vnet.subnet_ids[var.subnet_name]
+  vm_size              = var.vm_size
+  admin_username       = var.admin_username
+  admin_password       = var.admin_password
+  private_ip_address   = var.private_ip_address
+  availability_zone    = var.availability_zone
   storage_account_type = var.storage_account_type
-  tags                = var.tags
+  tags                 = var.tags
 
   depends_on = [azurerm_subnet_network_security_group_association.jumpservers]
 }

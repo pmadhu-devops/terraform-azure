@@ -1,5 +1,5 @@
-rg_name            = "AZB50-HUB-RG"
-location           = "eastus"
+rg_name  = "AZB50-HUB-RG"
+location = "eastus"
 tags = {
   environment = "hub"
   project     = "hub-setup"
@@ -50,10 +50,10 @@ security_rules = {
   }
 }
 
-vm_name            = "HUB-LNXSVR1"
-admin_username     = "adminmadhu"
-admin_password     = "India@123456"
-vm_size            = "Standard_B1s"
-private_ip_address = "10.50.1.10"
-availability_zone  = "1"
+vm_name              = "HUB-LNXSVR1"
+admin_username       = "adminmadhu"
+admin_password       = "India@123456"
+vm_size              = "Standard_B1s"
+private_ip_address   = "10.50.1.10"
+availability_zone    = "1"
 storage_account_type = "StandardSSD_LRS"
