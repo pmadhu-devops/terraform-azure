@@ -36,12 +36,12 @@ security_rules = {
 vm_name        = "self-hosted-agent-vm"
 vm_size        = "Standard_B2ms"
 admin_username = "adminmadhu"
-admin_password = "India@123456"
+# admin_password is set via TF_VAR_ADMIN_PASSWORD environment variable
 vm_tags = {
   Purpose = "azure-devops-voting-app"
 }
 
-azure_devops_url        = "https://dev.azure.com/madhu-devops-org"
-azure_devops_pat        = "*********"
+azure_devops_url = "https://dev.azure.com/madhu-devops-org"
+# azure_devops_pat is set via TF_VAR_AZURE_DEVOPS_PAT environment variable
 azure_devops_pool       = "ado-agent-pool"
 azure_devops_agent_name = "ado-agent"
