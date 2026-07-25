@@ -8,14 +8,20 @@ on:
       - "self-hosted-agent/**"
       - "modules/**"
       - ".github/workflows/self-hosted-agent.yml"
+
   workflow_dispatch:
 
 permissions:
   contents: read
-  id-token: write
 
 env:
   TF_IN_AUTOMATION: true
+
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
   TF_VAR_admin_password: ${{ secrets.TF_VAR_ADMIN_PASSWORD }}
   TF_VAR_azure_devops_pat: ${{ secrets.TF_VAR_AZURE_DEVOPS_PAT }}
 
@@ -23,6 +29,7 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     environment: terraform-apply
+
     defaults:
       run:
         working-directory: self-hosted-agent
@@ -33,25 +40,28 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
 
-      - name: Azure login with OIDC
+      - name: Azure Login
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Terraform format check
+      - name: Terraform Format Check
         run: terraform fmt -check -recursive
 
-      - name: Terraform init
+      - name: Terraform Init
         run: terraform init -input=false
 
-      - name: Terraform validate
+      - name: Terraform Validate
         run: terraform validate
 
-      - name: Terraform plan
+      - name: Terraform Plan
         run: terraform plan -input=false -out=tfplan
 
-      - name: Terraform apply
+      - name: Terraform Apply
         run: terraform apply -input=false -auto-approve tfplan
