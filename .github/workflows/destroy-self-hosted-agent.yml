@@ -41,11 +41,11 @@ jobs:
       - name: Terraform Init
         run: terraform init -input=false
 
-      - name: Terraform Validate
-        run: terraform validate
-
       - name: Terraform Destroy Plan
         run: terraform plan -destroy -input=false -out=destroy.tfplan
-
+      
+      - name: Terraform Show Destroy Plan
+        run: terraform show destroy.tfplan
+      
       - name: Terraform Destroy
         run: terraform apply -input=false -auto-approve destroy.tfplan
