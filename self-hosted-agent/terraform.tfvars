@@ -7,7 +7,7 @@ tags = {
 }
 # Acr Values
 acr_name = "samplevoteacr01"
-acr_sku = "Standard"
+acr_sku  = "Standard"
 
 vnet_name     = "self-hosted-agent-vnet"
 address_space = ["10.10.0.0/16"]
