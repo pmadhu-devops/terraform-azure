@@ -17,6 +17,11 @@ permissions:
 
 env:
   TF_IN_AUTOMATION: true
+<<<<<<< HEAD
+=======
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+>>>>>>> cb3b15254d356c538a009d6e445467592ab09f12
   TF_VAR_admin_password: ${{ secrets.TF_VAR_ADMIN_PASSWORD }}
   TF_VAR_azure_devops_pat: ${{ secrets.TF_VAR_AZURE_DEVOPS_PAT }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
